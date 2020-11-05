@@ -1,9 +1,13 @@
 <?php
 
 require_once './vendor/autoload.php';
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
+
+
+$requestBody = json_decode(file_get_contents('php://input'));
 
 
 // Create the Transport
@@ -16,13 +20,36 @@ $transport = (new Swift_SmtpTransport($_ENV['MAIL_HOST'], $_ENV['MAIL_PORT']))
 $mailer = new Swift_Mailer($transport);
 
 // Create a message
-$message = (new Swift_Message('Wonderful Subject'))
-  ->setFrom('john@doe.com')
-  ->setTo(['receiver@domain.org', 'other@domain.org' => 'A name'])
-  ->setBody('Here is the message itself')
+$message = (new Swift_Message($requestBody->subject))
+  ->setFrom($requestBody->from)
+  ->setTo($requestBody->to)
+  ->setBody($requestBody->body)
   ;
 
 // Send the message
 $result = $mailer->send($message);
 
-echo 'done';
+
+$capsule = new Capsule;
+
+$capsule->addConnection([
+    'driver'    => 'pgsql',
+    'host'      => '0.0.0.0',
+    'database'  => 'email_sender',
+    'username'  => 'root',
+    'password'  => 'root',
+    'charset'   => 'utf8',
+    'collation' => 'utf8_unicode_ci',
+    'prefix'    => '',
+]);
+$capsule->setAsGlobal();
+
+$users = Capsule::table('emails')->insert([
+  'from' => 'from',
+  'to' => 'to',
+  'subject' => 'subject',
+  'body' => 'body'
+]);
+
+// echo 'done';
+echo var_dump($users);
