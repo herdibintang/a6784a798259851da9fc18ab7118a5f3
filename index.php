@@ -34,10 +34,10 @@ $capsule = new Capsule;
 
 $capsule->addConnection([
     'driver'    => 'pgsql',
-    'host'      => '0.0.0.0',
-    'database'  => 'email_sender',
-    'username'  => 'root',
-    'password'  => 'root',
+    'host'      => $_ENV['DB_HOST'],
+    'database'  => $_ENV['DB_DATABASE'],
+    'username'  => $_ENV['DB_USERNAME'],
+    'password'  => $_ENV['DB_PASSWORD'],
     'charset'   => 'utf8',
     'collation' => 'utf8_unicode_ci',
     'prefix'    => '',
