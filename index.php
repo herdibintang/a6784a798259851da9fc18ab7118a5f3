@@ -8,11 +8,24 @@ use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use Phroute\Phroute\RouteCollector;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use \Firebase\JWT\JWT;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
+$capsule = new Capsule;
 
+$capsule->addConnection([
+  'driver'    => 'pgsql',
+  'host'      => $_ENV['DB_HOST'],
+  'database'  => $_ENV['DB_DATABASE'],
+  'username'  => $_ENV['DB_USERNAME'],
+  'password'  => $_ENV['DB_PASSWORD'],
+  'charset'   => 'utf8',
+  'collation' => 'utf8_unicode_ci',
+  'prefix'    => '',
+]);
+$capsule->setAsGlobal();
 
 $router = new RouteCollector();
 
@@ -21,24 +34,36 @@ $router->post('/user', function () {
 
   $hash = password_hash($requestBody->password, PASSWORD_BCRYPT);
 
-  $capsule = new Capsule;
-
-  $capsule->addConnection([
-    'driver'    => 'pgsql',
-    'host'      => $_ENV['DB_HOST'],
-    'database'  => $_ENV['DB_DATABASE'],
-    'username'  => $_ENV['DB_USERNAME'],
-    'password'  => $_ENV['DB_PASSWORD'],
-    'charset'   => 'utf8',
-    'collation' => 'utf8_unicode_ci',
-    'prefix'    => '',
-  ]);
-  $capsule->setAsGlobal();
-
   Capsule::table('users')->insert([
     'email' => $requestBody->email,
     'password' => $hash,
   ]);
+});
+
+$router->post('/user/login', function () {
+  $requestBody = json_decode(file_get_contents('php://input'));
+
+  $res = Capsule::table('users')
+    ->where('email', $requestBody->email)
+    ->first();
+
+  if (!$res) {
+    http_response_code(404);
+    return;
+  }
+
+  if (!password_verify($requestBody->password, $res->password)) {
+    http_response_code(400);
+    return;
+  }
+
+  $jwt = JWT::encode([], 'test');
+
+  echo json_encode([
+    'token' => $jwt
+  ]);
+
+  return;
 });
 
 $dispatcher = new Phroute\Phroute\Dispatcher($router->getData());
