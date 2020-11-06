@@ -2,6 +2,7 @@
     "require": {
         "swiftmailer/swiftmailer": "^6.0",
         "vlucas/phpdotenv": "^5.2",
-        "illuminate/database": "^8.13"
+        "illuminate/database": "^8.13",
+        "php-amqplib/php-amqplib": "^2.12"
     }
 }

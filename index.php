@@ -1,55 +1,25 @@
 <?php
 
 require_once './vendor/autoload.php';
-use Illuminate\Database\Capsule\Manager as Capsule;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 
-$requestBody = json_decode(file_get_contents('php://input'));
+$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$channel = $connection->channel();
+
+$channel->queue_declare('hello', false, false, false, false);
 
 
-// Create the Transport
-$transport = (new Swift_SmtpTransport($_ENV['MAIL_HOST'], $_ENV['MAIL_PORT']))
-  ->setUsername($_ENV['MAIL_USERNAME'])
-  ->setPassword($_ENV['MAIL_PASSWORD'])
-;
+$requestBody = file_get_contents('php://input');
 
-// Create the Mailer using your created Transport
-$mailer = new Swift_Mailer($transport);
+$msg = new AMQPMessage($requestBody);
 
-// Create a message
-$message = (new Swift_Message($requestBody->subject))
-  ->setFrom($requestBody->from)
-  ->setTo($requestBody->to)
-  ->setBody($requestBody->body)
-  ;
-
-// Send the message
-$result = $mailer->send($message);
+$channel->basic_publish($msg, '', 'hello');
 
 
-$capsule = new Capsule;
-
-$capsule->addConnection([
-    'driver'    => 'pgsql',
-    'host'      => $_ENV['DB_HOST'],
-    'database'  => $_ENV['DB_DATABASE'],
-    'username'  => $_ENV['DB_USERNAME'],
-    'password'  => $_ENV['DB_PASSWORD'],
-    'charset'   => 'utf8',
-    'collation' => 'utf8_unicode_ci',
-    'prefix'    => '',
-]);
-$capsule->setAsGlobal();
-
-$users = Capsule::table('emails')->insert([
-  'from' => 'from',
-  'to' => 'to',
-  'subject' => 'subject',
-  'body' => 'body'
-]);
-
-// echo 'done';
-echo var_dump($users);
+$channel->close();
+$connection->close();
