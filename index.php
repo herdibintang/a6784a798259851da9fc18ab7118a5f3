@@ -66,31 +66,50 @@ $router->post('/user/login', function () {
   return;
 });
 
+
+$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$channel = $connection->channel();
+
+$channel->queue_declare('hello', false, false, false, false);
+
+$router->post('/email/send', function () use ($channel, $connection) {
+  $headers = getallheaders();
+
+  if (empty($headers['Authorization'])) {
+    http_response_code(401);
+    return;
+  }
+
+  $token = '';
+  if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
+    $token = $matches[1];
+  }
+
+  try {
+    $decoded = JWT::decode($token, 'test', array('HS256'));
+  } catch (\Exception $e) {
+    http_response_code(401);
+    return;
+  }
+  
+  $requestBody = file_get_contents('php://input');
+
+  $msg = new AMQPMessage($requestBody);
+
+  $channel->basic_publish($msg, '', 'hello');
+
+  $channel->close();
+  $connection->close();
+});
+
 $dispatcher = new Phroute\Phroute\Dispatcher($router->getData());
 
 try {
   $response = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 } catch (HttpRouteNotFoundException $e) {
+  http_response_code(404);
   echo $e->getMessage();
 } catch (HttpMethodNotAllowedException $e) {
+  http_response_code(405);
   echo $e->getMessage();
 }
-// Print out the value returned from the dispatched function
-// echo $response;
-
-
-// $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
-// $channel = $connection->channel();
-
-// $channel->queue_declare('hello', false, false, false, false);
-
-
-// $requestBody = file_get_contents('php://input');
-
-// $msg = new AMQPMessage($requestBody);
-
-// $channel->basic_publish($msg, '', 'hello');
-
-
-// $channel->close();
-// $connection->close();
