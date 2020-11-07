@@ -5,10 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$connection = new AMQPStreamConnection($_ENV['QUEUE_HOST'], 5672, 'guest', 'guest');
 $channel = $connection->channel();
 
 $channel->queue_declare('hello', false, false, false, false);

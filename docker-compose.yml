@@ -1,5 +1,17 @@
 version: "3.8"
 services:
+  worker:
+    build: ./worker
+    env_file:
+      - ./worker/worker.env
+    environment:
+      QUEUE_HOST: queue
+      DB_HOST: db
+    depends_on:
+      - queue
+      - db
+    command: ["./wait-for-it.sh", "queue:5672", "--", "php", "index.php"]
+
   db:
     image: postgres
     restart: always
@@ -15,7 +27,7 @@ services:
     ports:
       - 8080:8080
 
-  rabbitmq:
+  queue:
     image: rabbitmq
     restart: always
     ports:
