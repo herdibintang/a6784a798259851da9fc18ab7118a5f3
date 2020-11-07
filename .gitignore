@@ -1,3 +1,5 @@
-.env
-vendor/
+server/vendor/
+server/server.env
+
+worker/vendor/
 worker/worker.env

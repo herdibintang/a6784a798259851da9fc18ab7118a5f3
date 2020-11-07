@@ -7,38 +7,14 @@ API to send email created in PHP.
 ### Prerequisite
 
 Make sure these was installed:
-* PHP
-* Composer
-* Postgresql
-* RabbitMQ
+* Docker
+* Docker-compose
 
-Then create a `.env` file that contains:
-```
-MAIL_HOST=smtp.example.com
-MAIL_PORT=12345
-MAIL_USERNAME=username
-MAIL_PASSWORD=password
-
-DB_HOST=0.0.0.0
-DB_USERNAME=username
-DB_PASSWORD=password
-DB_DATABASE=email_sender
-
-RABBITMQ_HOST=0.0.0.0
-RABBITMQ_PORT=12345
-RABBITMQ_USERNAME=username
-RABBITMQ_PASSWORD=password
-```
-Change it to suits your configurations.
-
-### Installing
-
-Run `composer install`
+Then change `worker.env.example` in `worker` to `worker.env` and modify it to suits your configurations. Do the same thing with `server.env.example` in `server` folder.
 
 ### Running
 
-* Run `php worker.php` in console
-* Run `php -S localhost:8000 server.php` in another console
+* Run `docker-compose up --build` in console
 * API now accessible in `http://localhost:8000`
 
 ## Usages
@@ -98,6 +74,6 @@ Example Request :
 Example Response :
 ```
 {
-    "message": "Email request added to queue"
+    "message": "Email sent"
 }
 ```
