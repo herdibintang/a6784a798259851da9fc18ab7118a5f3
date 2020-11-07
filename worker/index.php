@@ -52,10 +52,10 @@ $callback = function ($msg) {
     $capsule->setAsGlobal();
 
     Capsule::table('emails')->insert([
-      'from' => 'from',
-      'to' => 'to',
-      'subject' => 'subject',
-      'body' => 'body'
+      'from' => $requestBody->from,
+      'to' => $requestBody->to,
+      'subject' => $requestBody->subject,
+      'body' => $requestBody->body
     ]);
   }
 

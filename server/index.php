@@ -10,8 +10,6 @@ use Phroute\Phroute\RouteCollector;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use \Firebase\JWT\JWT;
 
-// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-// $dotenv->load();
 
 $capsule = new Capsule;
 
@@ -107,6 +105,12 @@ $router->post('/email/send', function () use ($channel, $connection) {
 
   $channel->close();
   $connection->close();
+
+  echo json_encode([
+    "message" => "Email request added to queue"
+  ]);
+
+  return;
 });
 
 $dispatcher = new Phroute\Phroute\Dispatcher($router->getData());

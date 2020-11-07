@@ -98,6 +98,6 @@ Example Request :
 Example Response :
 ```
 {
-    "message": "Email sent"
+    "message": "Email request added to queue"
 }
 ```
