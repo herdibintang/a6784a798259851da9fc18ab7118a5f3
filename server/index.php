@@ -10,8 +10,8 @@ use Phroute\Phroute\RouteCollector;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use \Firebase\JWT\JWT;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+// $dotenv->load();
 
 $capsule = new Capsule;
 
@@ -74,7 +74,7 @@ $router->post('/user/login', function () {
 });
 
 
-$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$connection = new AMQPStreamConnection($_ENV['QUEUE_HOST'], 5672, 'guest', 'guest');
 $channel = $connection->channel();
 
 $channel->queue_declare('hello', false, false, false, false);
