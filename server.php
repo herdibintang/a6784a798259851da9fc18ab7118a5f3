@@ -38,6 +38,12 @@ $router->post('/user', function () {
     'email' => $requestBody->email,
     'password' => $hash,
   ]);
+
+  echo json_encode([
+    'message' => 'User created'
+  ]);
+
+  return;
 });
 
 $router->post('/user/login', function () {
@@ -60,6 +66,7 @@ $router->post('/user/login', function () {
   $jwt = JWT::encode([], 'test');
 
   echo json_encode([
+    'message' => 'Token created',
     'token' => $jwt
   ]);
 
