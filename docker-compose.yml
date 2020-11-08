@@ -2,8 +2,6 @@ version: "3.8"
 services:
   server:
     build: ./server
-    env_file:
-      - ./server/server.env
     ports:
       - 8000:8000
     environment:
