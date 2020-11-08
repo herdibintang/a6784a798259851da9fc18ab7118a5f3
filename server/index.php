@@ -72,7 +72,7 @@ $router->post(
             return;
         }
 
-        $jwt = JWT::encode([], 'test');
+        $jwt = JWT::encode([], $_ENV['JWT_KEY']);
 
         echo json_encode(
             [
@@ -107,7 +107,7 @@ $router->post(
         }
 
         try {
-            $decoded = JWT::decode($token, 'test', array('HS256'));
+            $decoded = JWT::decode($token, $_ENV['JWT_KEY'], array('HS256'));
         } catch (\Exception $e) {
             http_response_code(401);
             return;
