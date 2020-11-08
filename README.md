@@ -10,7 +10,7 @@ Make sure these was installed:
 * Docker
 * Docker-compose
 
-Then change `worker.env.example` in `worker` to `worker.env` and modify it to suits your configurations. Do the same thing with `server.env.example` in `server` folder.
+Then change `worker.env.example` in `worker` to `worker.env` and modify it to suits your configurations.
 
 ### Running
 

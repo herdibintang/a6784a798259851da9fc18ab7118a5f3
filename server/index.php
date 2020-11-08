@@ -17,9 +17,9 @@ $capsule->addConnection(
     [
         'driver'    => 'pgsql',
         'host'      => $_ENV['DB_HOST'],
-        'database'  => $_ENV['DB_DATABASE'],
-        'username'  => $_ENV['DB_USERNAME'],
-        'password'  => $_ENV['DB_PASSWORD'],
+        'database'  => 'email_sender',
+        'username'  => 'root',
+        'password'  => 'root',
         'charset'   => 'utf8',
         'collation' => 'utf8_unicode_ci',
         'prefix'    => '',
